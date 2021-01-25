@@ -1,5 +1,18 @@
 const express = require('express')
-const formidable = require('formidable')
+const articleMiddleware = require('../middlewares/article.middleware')
+
+const multer = require('multer');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads');
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname)
+  }
+})
+
+const upload = multer({ storage: storage });
 
 const router = express.Router();
 
@@ -8,7 +21,7 @@ const { Article } = require('../models')
 // GET ALL ARTICLES
 router.get('/articles', (req, res) => {
   Article.findAll()
-  .then((articles) => {
+    .then((articles) => {
       res.send(articles)
     })
     .catch(error => {
@@ -17,7 +30,7 @@ router.get('/articles', (req, res) => {
 })
 
 // GET ARTICLE BY TITLE
-router.get('/article/:title', (req, res) => {
+router.get('/article/:title', articleMiddleware.validateNewPost, (req, res) => {
   Article.findAll({ where: { title: req.params.title } })
     // Article.findOne({where:{title:req.params.title}})
     .then((articles) => {
@@ -30,7 +43,8 @@ router.get('/article/:title', (req, res) => {
 })
 
 // ADD ARTICLE
-router.post('/article/add', (req, res) => {
+router.post('/article/add', upload.single('image'), (req, res) => {
+  console.log(req.file);
   const { title, subtitle, content } = req.body;
   Article.create({
     title: title,
@@ -40,7 +54,7 @@ router.post('/article/add', (req, res) => {
     console.log(error);
     res.json({ message: error });
   })
-  res.send('INSERT ARTICLES')
+  res.send('INSERTED')
 })
 
 // DELETE ARTICLE
