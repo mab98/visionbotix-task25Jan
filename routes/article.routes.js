@@ -46,7 +46,7 @@ router.post('/article/add', async (req, res) => {
     try {
       const { title, subtitle, content } = fields;
       Article.create({ title: title, subtitle: subtitle, content: content, imageUrl: files.image.name })
-      // res.send('ARTICLE INSERTED')
+      res.send('ARTICLE INSERTED')
     } catch (error) {
       console.log(error);
       res.json({ message: error });
