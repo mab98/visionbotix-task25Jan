@@ -32,27 +32,8 @@ router.get('/article/:title', async (req, res) => {
 })
 
 // ADD ARTICLE
-router.post('/article/add', async (req, res) => {
-  let form = new formidable.IncomingForm()
-  form.parse(req, function (err, fields, files) {
-
-    var oldPath = files.image.path
-    var newPath = './uploads/' + files.image.name
-    var rawData = fs.readFileSync(oldPath)
-    fs.writeFile(newPath, rawData, function (err) {
-      if (err) console.log(err)
-      // return res.send("Successfully uploaded")
-    })
-    try {
-      const { title, subtitle, content } = fields;
-      Article.create({ title: title, subtitle: subtitle, content: content, imageUrl: files.image.name })
-      res.send('ARTICLE INSERTED')
-    } catch (error) {
-      console.log(error);
-      res.json({ message: error });
-    }
+router.post('/article/add', articleMiddleware.attachBodyAndFiles, articleMiddleware.validatePostArticle, async (req, res) => {
   })
-})
 
 // DELETE ARTICLE
 router.delete('/article/delete/:title', async (req, res) => {

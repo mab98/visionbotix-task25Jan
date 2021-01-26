@@ -1,11 +1,23 @@
 'use strict'
 
+const formidable = require('formidable');
 const _ = require('lodash')
 
+const attachBodyAndFiles = (req, res, next) => {
+  let form = new formidable.IncomingForm()
+  form.parse(req, function (err, fields, files) {
+    req.body = fields;
+    req.files = files;
+    next()
+  })
+}
+
 const validatePostArticle = (req, res, next) => {
-  console.log(req.body);
-  console.log(req.files);
+  // console.log('BODY: ', req.body);
+  // console.log('FILES: ', req.files.image.name);
+
   const errorArray = []
+  const file = req.files
 
   const { title, subtitle, content } = req.body
 
@@ -36,13 +48,9 @@ const validatePostArticle = (req, res, next) => {
   if (content.length > 1000) {
     errorArray.push('Content more than 1000')
   }
-  if (!req.params.file) {
+  if (_.isEmpty(file.image)) {
     console.log('NO FILE');
     errorArray.push('No Image File')
-  }
-  if (req.params.file) {
-    console.log(' FILE', req.params.file);
-    errorArray.push('File')
   }
 
   console.log('ERROR ARRAY: ', errorArray);
@@ -56,4 +64,4 @@ const validatePostArticle = (req, res, next) => {
   }
 }
 
-module.exports = { validatePostArticle };
+module.exports = { validatePostArticle, attachBodyAndFiles };
