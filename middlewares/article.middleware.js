@@ -53,10 +53,9 @@ const validatePostArticle = (req, res, next) => {
     errorArray.push('No Image File')
   }
 
-  console.log('ERROR ARRAY: ', errorArray);
+  // console.log('ERROR ARRAY: ', errorArray);
 
   if (errorArray.length == 0) {
-    res.send('ARTICLE INSERTED')
     next()
   }
   else {

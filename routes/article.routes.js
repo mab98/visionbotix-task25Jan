@@ -1,12 +1,12 @@
 const fs = require('fs')
 const express = require('express')
 const articleMiddleware = require('../middlewares/article.middleware')
+const articleController = require('../controllers/article.controller')
 const formidable = require('formidable');
 
 const router = express.Router();
 
 const { Article } = require('../models');
-const { error } = require('console');
 
 // GET ALL ARTICLES
 router.get('/articles', async (req, res) => {
@@ -32,8 +32,7 @@ router.get('/article/:title', async (req, res) => {
 })
 
 // ADD ARTICLE
-router.post('/article/add', articleMiddleware.attachBodyAndFiles, articleMiddleware.validatePostArticle, async (req, res) => {
-  })
+router.post('/article/add', articleMiddleware.attachBodyAndFiles, articleMiddleware.validatePostArticle, articleController.addArticle)
 
 // DELETE ARTICLE
 router.delete('/article/delete/:title', async (req, res) => {
