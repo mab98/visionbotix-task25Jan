@@ -1,3 +1,4 @@
+const fs = require('fs')
 const express = require('express')
 const articleMiddleware = require('../middlewares/article.middleware')
 
@@ -16,7 +17,8 @@ const upload = multer({ storage: storage });
 
 const router = express.Router();
 
-const { Article } = require('../models')
+const { Article } = require('../models');
+const { error } = require('console');
 
 // GET ALL ARTICLES
 router.get('/articles', async (req, res) => {
@@ -57,9 +59,23 @@ router.post('/article/add', upload.single('image'), async (req, res) => {
 // DELETE ARTICLE
 router.delete('/article/delete/:title', async (req, res) => {
   try {
-    await Article.destroy({ where: { title: req.params.title } });
-    res.send('DELETE ARTICLES')
-  } catch (error) {
+    const article = await Article.findOne({ where: { title: req.params.title } })
+    if (article) {
+      const image = await article.imageUrl;
+      console.log(image);
+      const path = `./uploads/${article.imageUrl}`
+      console.log(path);
+      if (path) {
+        fs.unlinkSync(path)
+      }
+      await Article.destroy({ where: { title: req.params.title } });
+      return res.send('DELETED ARTICLES')
+    }
+    else {
+      return res.send(`NO ARTICLE WITH TITLE: ${req.params.title}`)
+    }
+  }
+  catch (error) {
     console.log(error);
     res.json({ message: error });
   }
