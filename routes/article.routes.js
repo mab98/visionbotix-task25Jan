@@ -44,7 +44,7 @@ router.get('/article/:title', async (req, res) => {
 })
 
 // ADD ARTICLE
-router.post('/article/add', upload.single('image'), articleMiddleware.validateNewPost, async (req, res) => {
+router.post('/article/add', upload.single('image'), articleMiddleware.validatePostArticle, async (req, res) => {
   // console.log('FILE INFO: ',req.file);
   try {
     const { title, subtitle, content, image } = await req.body;
