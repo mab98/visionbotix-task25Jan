@@ -44,12 +44,12 @@ router.get('/article/:title', async (req, res) => {
 })
 
 // ADD ARTICLE
-router.post('/article/add', upload.single('image'), async (req, res) => {
+router.post('/article/add', upload.single('image'), articleMiddleware.validateNewPost, async (req, res) => {
   // console.log('FILE INFO: ',req.file);
   try {
     const { title, subtitle, content, image } = await req.body;
     await Article.create({ title: title, subtitle: subtitle, content: content, imageUrl: req.file.originalname })
-    res.send('ARTICLE INSERTED')
+    // res.send('ARTICLE INSERTED')
   } catch (error) {
     console.log(error);
     res.json({ message: error });
