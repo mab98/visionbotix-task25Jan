@@ -19,67 +19,67 @@ const router = express.Router();
 const { Article } = require('../models')
 
 // GET ALL ARTICLES
-router.get('/articles', (req, res) => {
-  Article.findAll()
-    .then((articles) => {
-      res.send(articles)
-    })
-    .catch(error => {
-      console.log(error);
-    })
+router.get('/articles', async (req, res) => {
+  try {
+    const articles = await Article.findAll();
+    res.send(articles)
+  } catch (error) {
+    console.log(error);
+    res.json({ message: error });
+  }
 })
 
 // GET ARTICLE BY TITLE
-router.get('/article/:title', articleMiddleware.validateNewPost, (req, res) => {
-  Article.findAll({ where: { title: req.params.title } })
-    // Article.findOne({where:{title:req.params.title}})
-    .then((articles) => {
-      res.send(articles)
-    })
-    .catch(error => {
-      console.log(error);
-      res.json({ message: error });
-    })
+router.get('/article/:title', async (req, res) => {
+  try {
+    const articles = await Article.findAll({ where: { title: req.params.title } })
+    // const articles = await Article.findOne({where:{title:req.params.title}})
+    res.send(articles)
+  } catch (error) {
+    console.log(error);
+    res.json({ message: error });
+  }
 })
 
 // ADD ARTICLE
-router.post('/article/add', upload.single('image'), (req, res) => {
+router.post('/article/add', upload.single('image'), async (req, res) => {
   // console.log('FILE INFO: ',req.file);
-  const { title, subtitle, content, image } = req.body;
-  Article.create({
-    title: title,
-    subtitle: subtitle,
-    content: content,
-    imageUrl: req.file.originalname
-  }).catch((error) => {
+  try {
+    const { title, subtitle, content, image } = await req.body;
+    await Article.create({ title: title, subtitle: subtitle, content: content, imageUrl: req.file.originalname })
+    res.send('ARTICLE INSERTED')
+  } catch (error) {
     console.log(error);
     res.json({ message: error });
-  })
-  res.send('INSERTED')
+  }
 })
 
 // DELETE ARTICLE
-router.delete('/article/delete/:title', (req, res) => {
-  Article.destroy({ where: { title: req.params.title } });
-  res.send('DELETE ARTICLES')
+router.delete('/article/delete/:title', async (req, res) => {
+  try {
+    await Article.destroy({ where: { title: req.params.title } });
+    res.send('DELETE ARTICLES')
+  } catch (error) {
+    console.log(error);
+    res.json({ message: error });
+  }
 })
 
 // UPDATE ARTICLE
-router.patch('/article/update/:title', (req, res) => {
+router.patch('/article/update/:title', async (req, res) => {
   const { subtitle, content } = req.body;
-  Article.update({
-    subtitle: subtitle,
-    content: content
-  },
-    { where: { title: req.params.title } }
-  )
-    .then(() => {
-      res.json("UPDATED ARTICLE")
-    })
-    .catch(error => {
-      console.log(error);
-      res.json({ message: error });
-    })
+  try {
+    await Article.update({
+      subtitle: subtitle,
+      content: content
+    },
+      { where: { title: req.params.title } }
+    )
+    res.json("UPDATED ARTICLE")
+  } catch (error) {
+    console.log(error);
+    res.json({ message: error });
+  }
 })
 
 module.exports = router;
