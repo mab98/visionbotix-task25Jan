@@ -1,19 +1,7 @@
 const fs = require('fs')
 const express = require('express')
 const articleMiddleware = require('../middlewares/article.middleware')
-
-const multer = require('multer');
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads');
-  },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname)
-  }
-})
-
-const upload = multer({ storage: storage });
+const formidable = require('formidable');
 
 const router = express.Router();
 
@@ -44,16 +32,26 @@ router.get('/article/:title', async (req, res) => {
 })
 
 // ADD ARTICLE
-router.post('/article/add', upload.single('image'), articleMiddleware.validatePostArticle, async (req, res) => {
-  // console.log('FILE INFO: ',req.file);
-  try {
-    const { title, subtitle, content, image } = await req.body;
-    await Article.create({ title: title, subtitle: subtitle, content: content, imageUrl: req.file.originalname })
-    // res.send('ARTICLE INSERTED')
-  } catch (error) {
-    console.log(error);
-    res.json({ message: error });
-  }
+router.post('/article/add', async (req, res) => {
+  let form = new formidable.IncomingForm()
+  form.parse(req, function (err, fields, files) {
+
+    var oldPath = files.image.path
+    var newPath = './uploads/' + files.image.name
+    var rawData = fs.readFileSync(oldPath)
+    fs.writeFile(newPath, rawData, function (err) {
+      if (err) console.log(err)
+      return res.send("Successfully uploaded")
+    })
+    try {
+      const { title, subtitle, content } = fields;
+      Article.create({ title: title, subtitle: subtitle, content: content, imageUrl: files.image.name })
+      // res.send('ARTICLE INSERTED')
+    } catch (error) {
+      console.log(error);
+      res.json({ message: error });
+    }
+  })
 })
 
 // DELETE ARTICLE
@@ -82,7 +80,7 @@ router.delete('/article/delete/:title', async (req, res) => {
 })
 
 // UPDATE ARTICLE
-router.patch('/article/update/:title', upload.single('image'), async (req, res) => {
+router.patch('/article/update/:title', async (req, res) => {
   try {
     const article = await Article.findOne({ where: { title: req.params.title } })
     if (article) {
