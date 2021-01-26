@@ -27,10 +27,10 @@ module.exports = (sequelize, DataTypes) => {
         max: 1000
       }
     }
-    // , imageUrl: {
-    //   type: DataTypes.STRING(150),
-    //   allowNull: false
-    // }
+    , imageUrl: {
+      type: DataTypes.STRING(150),
+      allowNull: false
+    }
   })
 
   return Article;

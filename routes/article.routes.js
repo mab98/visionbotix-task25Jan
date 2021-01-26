@@ -44,12 +44,13 @@ router.get('/article/:title', articleMiddleware.validateNewPost, (req, res) => {
 
 // ADD ARTICLE
 router.post('/article/add', upload.single('image'), (req, res) => {
-  console.log(req.file);
-  const { title, subtitle, content } = req.body;
+  // console.log('FILE INFO: ',req.file);
+  const { title, subtitle, content, image } = req.body;
   Article.create({
     title: title,
     subtitle: subtitle,
-    content: content
+    content: content,
+    imageUrl: req.file.originalname
   }).catch((error) => {
     console.log(error);
     res.json({ message: error });
