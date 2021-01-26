@@ -41,7 +41,7 @@ router.post('/article/add', async (req, res) => {
     var rawData = fs.readFileSync(oldPath)
     fs.writeFile(newPath, rawData, function (err) {
       if (err) console.log(err)
-      return res.send("Successfully uploaded")
+      // return res.send("Successfully uploaded")
     })
     try {
       const { title, subtitle, content } = fields;
